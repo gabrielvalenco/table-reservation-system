@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CalendarDays, Minus, Plus, Sun, Moon, Users } from "lucide-react";
+import { CalendarDays, CircleCheck, Minus, Moon, Plus, Sun, Users } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { createReservation, getAvailability } from "./api";
 import { DatePicker } from "./components/date-picker";
-import { Logo, PaintFilters, Splatter, Wash, Wordmark } from "./components/ink";
+import { Logo, Ornament, PlaceSetting, Wordmark } from "./components/ornaments";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
@@ -17,7 +17,7 @@ import { cn } from "./lib/utils";
 // Espelha rules.closedWeekdays da API (segunda-feira); a API continua sendo quem decide.
 const CLOSED_WEEKDAYS = [1];
 
-const paint =(color: string) => ({ ["--paint" as string]: color });
+const steps = ["Escolha o dia e quantas pessoas", "Veja os horários livres", "Confirme com seus dados"];
 
 export function App() {
   const today = todayInSaoPaulo();
@@ -62,69 +62,64 @@ export function App() {
   const slots = availability.data?.slots ?? [];
   const lunch = slots.filter(isLunch);
   const dinner = slots.filter((iso) => !isLunch(iso));
+  const people = (count: number) => `${count} ${count === 1 ? "pessoa" : "pessoas"}`;
 
   return (
     <div className="relative overflow-hidden">
-      <PaintFilters />
-
-      <header className="relative mx-auto flex max-w-6xl items-center gap-3 px-5 py-5">
-        <Logo />
-        <Wordmark />
+      <header className="border-border/70 relative border-b">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-4">
+          <Logo />
+          <Wordmark />
+        </div>
       </header>
 
-      <main className="relative mx-auto grid max-w-6xl gap-10 px-5 pt-4 pb-20 lg:grid-cols-[1fr_28rem] lg:gap-16 lg:pt-12">
+      <main className="relative mx-auto grid max-w-6xl gap-12 px-5 pt-12 pb-24 lg:grid-cols-[1fr_28rem] lg:gap-20 lg:pt-20">
         <section className="relative">
-          <Wash className="-top-6 -left-6 h-44 w-[110%] text-ochre/35" />
-          <p className="text-primary relative font-semibold tracking-[0.25em] uppercase">Reservas</p>
-          <h1 className="relative mt-4">
-            <span className="font-display text-foreground block text-4xl font-semibold md:text-6xl">Sua mesa,</span>
-            <span className="font-cartoon sticker-text text-primary my-1 block origin-left -rotate-3 text-7xl leading-[1.05] md:text-9xl">
-              pintada
-            </span>
-            <span className="font-display text-foreground block text-4xl font-semibold md:text-6xl">para você.</span>
-          </h1>
-          <p className="text-muted-foreground relative mt-6 max-w-md text-lg">
-            Escolha o dia, o horário e quantas pessoas vêm. A gente reserva a melhor mesa e deixa tudo pronto.
+          <p className="text-terracotta relative flex items-center gap-3 text-sm font-medium tracking-[0.3em] uppercase">
+            <span className="bg-terracotta h-px w-10" aria-hidden="true" />
+            Reservas online
+          </p>
+          <div className="relative mt-6 flex items-center justify-between gap-6">
+            <h1 className="text-5xl leading-[1.05] font-medium md:text-7xl">
+              Reserve
+              <br />
+              sua <em className="text-terracotta font-normal">mesa.</em>
+            </h1>
+            <PlaceSetting className="hidden size-36 shrink-0 sm:block md:size-44" />
+          </div>
+          <p className="text-muted-foreground relative mt-7 max-w-md text-lg leading-relaxed">
+            Escolha o dia, o horário e quantas pessoas vêm. A gente deixa a melhor mesa pronta para você.
           </p>
 
-          <ul className="relative mt-10 grid max-w-md gap-4 text-sm">
-            {[
-              ["Escolha o dia e as pessoas", "var(--ochre)"],
-              ["Veja os horários livres", "var(--teal)"],
-              ["Confirme com seus dados", "var(--tomato)"],
-            ].map(([label, color], index) => (
-              <li key={label} className="flex items-center gap-4">
-                <span
-                  className="paint grid size-9 place-items-center rounded-full font-display text-lg font-bold text-white"
-                  style={paint(color!)}
-                >
-                  {index + 1}
-                </span>
+          <Ornament className="mt-12 max-w-md" />
+
+          <ol className="relative mt-6 max-w-md">
+            {steps.map((label, index) => (
+              <li key={label} className="border-border flex items-baseline gap-5 border-t py-4 last:border-b">
+                <span className="font-display text-gold w-9 shrink-0 text-2xl italic">{String(index + 1).padStart(2, "0")}</span>
                 <span className="text-base font-medium">{label}</span>
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
 
         <section aria-label="Reserva" className="relative">
-          <Splatter className="-top-9 -right-7 size-32 rotate-12 text-ochre/70" />
           {reserve.isSuccess ? (
             <Confirmation
-              partySize={reserve.data.partySize}
-              startsAt={reserve.data.startsAt}
+              summary={`Mesa para ${people(reserve.data.partySize)}, ${formatDate(reserve.data.startsAt)} às ${formatTime(reserve.data.startsAt)}.`}
               onReset={() => {
                 reserve.reset();
                 setSlot(null);
               }}
             />
           ) : (
-            <div className="grid gap-8">
-              <Card className="paint paint-card bg-transparent shadow-none" style={paint("var(--card)")}>
+            <div className="relative grid gap-6">
+              <Card className="bg-card/90 border-border relative rounded-xl shadow-sm outline-gold/45 outline outline-1 -outline-offset-[7px] py-8">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Quando?</CardTitle>
+                  <CardTitle className="text-3xl font-medium">Quando?</CardTitle>
                   <CardDescription>Aceitamos reservas de hoje até 30 dias à frente.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-5">
+                <CardContent className="grid gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="date">
                       <CalendarDays className="size-4" /> Data
@@ -146,7 +141,7 @@ export function App() {
                     <Label id="party-label">
                       <Users className="size-4" /> Pessoas
                     </Label>
-                    <div className="flex items-center gap-3" role="group" aria-labelledby="party-label">
+                    <div className="flex items-center gap-4" role="group" aria-labelledby="party-label">
                       <Button
                         type="button"
                         variant="outline"
@@ -157,7 +152,7 @@ export function App() {
                       >
                         <Minus />
                       </Button>
-                      <output className="font-display w-12 text-center text-3xl font-bold" aria-live="polite">
+                      <output className="font-display w-10 text-center text-3xl font-medium" aria-live="polite">
                         {partySize}
                       </output>
                       <Button
@@ -173,7 +168,7 @@ export function App() {
                     </div>
                   </div>
 
-                  <div aria-live="polite" className="grid gap-4">
+                  <div aria-live="polite" className="grid gap-5">
                     {availability.isPending && availability.fetchStatus !== "idle" && (
                       <p className="text-muted-foreground">Procurando mesas…</p>
                     )}
@@ -184,8 +179,7 @@ export function App() {
                     )}
                     {availability.isSuccess && slots.length === 0 && (
                       <p className="text-muted-foreground">
-                        Sem horários livres nesse dia para {partySize} {partySize === 1 ? "pessoa" : "pessoas"}. Tente
-                        outra data.
+                        Sem horários livres nesse dia para {people(partySize)}. Tente outra data.
                       </p>
                     )}
                     <SlotGroup title="Almoço" icon={<Sun className="size-4" />} slots={lunch} selected={slot} onSelect={setSlot} />
@@ -195,43 +189,37 @@ export function App() {
               </Card>
 
               {slot && (
-                <Card className="paint paint-card bg-transparent shadow-none" style={paint("var(--card)")}>
+                <Card className="bg-card/90 border-border relative rounded-xl shadow-sm outline-gold/45 outline outline-1 -outline-offset-[7px] py-8">
                   <form onSubmit={onSubmit}>
                     <CardHeader className="mb-5">
-                      <CardTitle className="text-2xl">Seus dados</CardTitle>
-                      <CardDescription>
-                        <Badge variant="secondary" className="mr-1">
+                      <CardTitle className="text-3xl font-medium">Seus dados</CardTitle>
+                      <CardDescription className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary" className="font-sans font-medium">
                           {formatDate(slot)}, {formatTime(slot)}
                         </Badge>
-                        para {partySize} {partySize === 1 ? "pessoa" : "pessoas"}
+                        <span>para {people(partySize)}</span>
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
                       <Field id="name" label="Nome">
-                        <Input id="name" name="name" autoComplete="name" required maxLength={100} className="bg-background/70 h-11" />
+                        <Input id="name" name="name" autoComplete="name" required maxLength={100} className="bg-background/60 h-11" />
                       </Field>
                       <Field id="phone" label="Telefone">
-                        <Input id="phone" name="phone" type="tel" autoComplete="tel" required className="bg-background/70 h-11" />
+                        <Input id="phone" name="phone" type="tel" autoComplete="tel" required className="bg-background/60 h-11" />
                       </Field>
                       <Field id="email" label="E-mail">
-                        <Input id="email" name="email" type="email" autoComplete="email" required maxLength={254} className="bg-background/70 h-11" />
+                        <Input id="email" name="email" type="email" autoComplete="email" required maxLength={254} className="bg-background/60 h-11" />
                       </Field>
                       <Field id="notes" label="Observações (opcional)">
-                        <Textarea id="notes" name="notes" maxLength={500} rows={3} className="bg-background/70" />
+                        <Textarea id="notes" name="notes" maxLength={500} rows={3} className="bg-background/60" />
                       </Field>
                       {reserve.isError && (
                         <p role="alert" className="text-destructive font-medium">
                           {errorMessage(reserve.error)}
                         </p>
                       )}
-                      <Button
-                        type="submit"
-                        size="lg"
-                        disabled={reserve.isPending}
-                        className="paint mt-2 h-12 w-full bg-transparent text-base text-white hover:bg-transparent"
-                        style={paint("var(--primary)")}
-                      >
-                        {reserve.isPending ? "Reservando…" : `Reservar às ${formatTime(slot)}`}
+                      <Button type="submit" size="lg" disabled={reserve.isPending} className="mt-2 h-12 w-full text-base">
+                        {reserve.isPending ? "Reservando…" : `Confirmar reserva às ${formatTime(slot)}`}
                       </Button>
                     </CardContent>
                   </form>
@@ -242,7 +230,7 @@ export function App() {
         </section>
       </main>
 
-      <footer className="text-muted-foreground relative border-t px-5 py-8 text-center text-sm">
+      <footer className="text-muted-foreground border-border/70 relative border-t px-5 py-8 text-center text-sm">
         Pincelada · Cozinha de autor · Horários em Brasília
       </footer>
     </div>
@@ -273,11 +261,11 @@ function SlotGroup({
 }) {
   if (slots.length === 0) return null;
   return (
-    <div className="grid gap-2">
-      <h3 className="flex items-center gap-2 text-base font-bold">
+    <div className="grid gap-3">
+      <h3 className="text-muted-foreground flex items-center gap-2 text-sm font-medium tracking-[0.2em] uppercase">
         {icon} {title}
       </h3>
-      <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
         {slots.map((iso) => {
           const active = selected === iso;
           return (
@@ -287,11 +275,7 @@ function SlotGroup({
                 variant={active ? "default" : "outline"}
                 aria-pressed={active}
                 onClick={() => onSelect(iso)}
-                className={cn(
-                  "h-11 w-full text-base",
-                  active ? "paint bg-transparent text-white hover:bg-transparent" : "bg-card/80 hover:bg-ochre/30",
-                )}
-                style={active ? paint("var(--teal)") : undefined}
+                className={cn("h-11 w-full text-base tabular-nums", !active && "bg-background/60")}
               >
                 {formatTime(iso)}
               </Button>
@@ -303,18 +287,14 @@ function SlotGroup({
   );
 }
 
-function Confirmation({ partySize, startsAt, onReset }: { partySize: number; startsAt: string; onReset: () => void }) {
+function Confirmation({ summary, onReset }: { summary: string; onReset: () => void }) {
   return (
-    <Card className="paint paint-card relative overflow-visible bg-transparent shadow-none" style={paint("var(--card)")}>
-      <Splatter className="-top-10 -right-8 size-40 text-tomato/35" />
+    <Card className="bg-card/90 border-border relative rounded-xl shadow-sm outline-gold/45 outline outline-1 -outline-offset-[7px] py-8">
       <CardHeader>
-        <Badge className="paint w-fit -rotate-3 bg-transparent px-4 py-1 text-base text-white" style={paint("var(--teal)")}>
-          Confirmada
-        </Badge>
-        <CardTitle className="mt-3 text-4xl">Mesa reservada!</CardTitle>
+        <CircleCheck className="text-forest mb-2 size-10" strokeWidth={1.5} aria-hidden="true" />
+        <CardTitle className="text-4xl font-medium">Reserva confirmada</CardTitle>
         <CardDescription role="status" className="text-base">
-          Mesa para {partySize} {partySize === 1 ? "pessoa" : "pessoas"}, {formatDate(startsAt)} às {formatTime(startsAt)}.
-          Esperamos você.
+          {summary} Esperamos você.
         </CardDescription>
       </CardHeader>
       <CardContent>

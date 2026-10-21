@@ -1,41 +1,39 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/fredoka";
-@import "@fontsource-variable/nunito";
-@import "@fontsource/chewy";
+@import "@fontsource-variable/playfair-display";
+@import "@fontsource-variable/playfair-display/wght-italic.css";
+@import "@fontsource-variable/dm-sans";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.75rem;
-  --paper: #f6eddc;
-  --background: #f6eddc;
-  --foreground: #231a15;
-  --card: #fbf5e8;
-  --card-foreground: #231a15;
-  --popover: #fbf5e8;
-  --popover-foreground: #231a15;
-  --primary: #b3321d;
-  --primary-foreground: #fff6e8;
-  --secondary: #e9d9b8;
-  --secondary-foreground: #3a2a1d;
-  --muted: #eadfc6;
-  --muted-foreground: #5f4d3e;
-  --accent: #d99a1e;
-  --accent-foreground: #231a15;
-  --destructive: #a1210f;
-  --border: #cdb995;
-  --input: #b9a37c;
-  --ring: #2f6f6a;
-  --teal: #2f6f6a;
-  --ochre: #e0a232;
-  --tomato: #c8402a;
+  --radius: 0.5rem;
+  --background: #f4efe4;
+  --foreground: #1f1c18;
+  --card: #faf6ec;
+  --card-foreground: #1f1c18;
+  --popover: #faf6ec;
+  --popover-foreground: #1f1c18;
+  --primary: #2e4636;
+  --primary-foreground: #f7f2e6;
+  --secondary: #e8e0cc;
+  --secondary-foreground: #2b2620;
+  --muted: #ebe4d2;
+  --muted-foreground: #5d5548;
+  --accent: #e6dcc3;
+  --accent-foreground: #1f1c18;
+  --destructive: #9b2c1c;
+  --border: #d4c9ae;
+  --input: #c4b794;
+  --ring: #2e4636;
+  --forest: #2e4636;
+  --terracotta: #b4532a;
+  --gold: #a8863f;
 }
 
 @theme inline {
-  --font-sans: "Nunito Variable", system-ui, sans-serif;
-  --font-display: "Fredoka Variable", system-ui, sans-serif;
-  --font-cartoon: "Chewy", "Fredoka Variable", system-ui, sans-serif;
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-display: "Playfair Display Variable", Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -54,13 +52,13 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-teal: var(--teal);
-  --color-ochre: var(--ochre);
-  --color-tomato: var(--tomato);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-forest: var(--forest);
+  --color-terracotta: var(--terracotta);
+  --color-gold: var(--gold);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
 @layer base {
@@ -76,82 +74,17 @@
     @apply bg-background text-foreground font-sans antialiased;
     min-height: 100vh;
     background-image:
-      radial-gradient(ellipse 60% 40% at 8% 0%, rgb(224 162 50 / 0.28), transparent 70%),
-      radial-gradient(ellipse 50% 45% at 100% 20%, rgb(47 111 106 / 0.2), transparent 70%),
-      radial-gradient(ellipse 55% 40% at 0% 100%, rgb(200 64 42 / 0.2), transparent 70%);
+      radial-gradient(ellipse 55% 35% at 0% 0%, rgb(168 134 63 / 0.16), transparent 70%),
+      radial-gradient(ellipse 45% 40% at 100% 30%, rgb(46 70 54 / 0.12), transparent 70%);
     background-attachment: fixed;
-  }
-
-  /* Grão de papel aquarela sobre toda a página. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    pointer-events: none;
-    opacity: 0.35;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.27  0 0 0 0 0.18  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 
   h1,
   h2,
-  h3 {
-    @apply font-display tracking-tight;
-  }
-
-  [data-slot="card-title"],
-  [data-slot="badge"] {
+  h3,
+  [data-slot="card-title"] {
     font-family: var(--font-display);
+    letter-spacing: -0.01em;
   }
 }
 
-@layer components {
-  /* Letra de adesivo: contorno escuro grosso e sombra deslocada, como num desenho animado. */
-  .sticker-text {
-    -webkit-text-stroke: var(--sticker-stroke, 0.08em) var(--foreground);
-    paint-order: stroke fill;
-    text-shadow: 0.06em 0.07em 0 var(--sticker-shadow, var(--ochre));
-    stroke-linejoin: round;
-  }
-
-  /* Pincelada com borda irregular: o fundo vai num pseudo-elemento para o texto não ser distorcido. */
-  .paint {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .paint::before {
-    content: "";
-    position: absolute;
-    inset: -3px -5px;
-    z-index: -1;
-    border-radius: inherit;
-    background: var(--paint, var(--primary));
-    filter: url(#rough-edge);
-    transition: transform 0.2s ease;
-  }
-
-  .paint:hover::before {
-    transform: rotate(-0.8deg) scale(1.03);
-  }
-
-  .paint-card::before {
-    inset: -6px -8px;
-    box-shadow: 0 6px 0 rgb(35 26 21 / 0.08);
-  }
-
-  .brush-underline {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 20' preserveAspectRatio='none'><path d='M3 12 C 40 4, 80 18, 130 9 S 220 4, 297 11' fill='none' stroke='%23c8402a' stroke-width='7' stroke-linecap='round'/><path d='M10 15 C 70 11, 150 17, 280 13' fill='none' stroke='%23e0a232' stroke-width='3' stroke-linecap='round' opacity='.8'/></svg>");
-    background-repeat: no-repeat;
-    background-size: 100% 0.45em;
-    background-position: 0 100%;
-    padding-bottom: 0.2em;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .paint::before {
-    transition: none;
-  }
-}

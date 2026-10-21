@@ -56,8 +56,7 @@ export function DatePicker({ id, value, onChange, min, max, disabled, className 
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="paint paint-card w-auto border-0 bg-transparent p-2 shadow-none"
-        style={{ ["--paint" as string]: "var(--card)" }}
+        className="bg-card w-auto p-2 shadow-md"
       >
         <Calendar
           mode="single"
@@ -71,7 +70,7 @@ export function DatePicker({ id, value, onChange, min, max, disabled, className 
             setOpen(false);
           }}
           classNames={{
-            today: "[&>button]:ring-2 [&>button]:ring-ochre [&>button]:font-bold",
+            today: "[&>button]:ring-2 [&>button]:ring-terracotta [&>button]:font-bold",
           }}
           className="[--cell-size:--spacing(10)] sm:[--cell-size:--spacing(11)]"
         />
