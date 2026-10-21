@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 import pg from "pg";
 import { z } from "zod";
-import { checkSlot, endOf } from "./rules.js";
+import { checkSlot, endOf, rules, slotsOf } from "./rules.js";
 
 const createReservationBody = z.object({
   name: z.string().trim().min(1).max(100),
@@ -12,9 +12,39 @@ const createReservationBody = z.object({
   notes: z.string().trim().max(500).optional(),
 });
 
+const availabilityQuery = z.object({
+  date: z.iso.date(),
+  partySize: z.coerce.number().int().min(1).max(50),
+});
+
 type Options = { pool: pg.Pool; now: () => Date };
 
 export const reservationRoutes: FastifyPluginAsync<Options> = async (app, { pool, now }) => {
+  app.get("/availability", async (request, reply) => {
+    const query = availabilityQuery.safeParse(request.query);
+    if (!query.success) return reply.code(400).send({ error: "invalid_query", issues: query.error.issues });
+
+    const { date, partySize } = query.data;
+    const slots = slotsOf(date).filter((slot) => checkSlot(slot, now()) === null);
+
+    const { rows } = await pool.query<{ startsAt: Date }>(
+      `SELECT s.starts_at AS "startsAt" FROM unnest($1::timestamptz[]) AS s (starts_at)
+       WHERE EXISTS (
+         SELECT 1 FROM tables t
+         WHERE t.active AND t.capacity >= $2
+           AND NOT EXISTS (
+             SELECT 1 FROM reservations r
+             WHERE r.table_id = t.id AND r.status = 'confirmed'
+               AND tstzrange(r.starts_at, r.ends_at) && tstzrange(s.starts_at, s.starts_at + make_interval(mins => $3))
+           )
+       )
+       ORDER BY 1`,
+      [slots, partySize, rules.durationMinutes],
+    );
+
+    return { date, partySize, slots: rows.map((row) => row.startsAt) };
+  });
+
   app.post("/reservations", async (request, reply) => {
     const body = createReservationBody.safeParse(request.body);
     if (!body.success) return reply.code(400).send({ error: "invalid_body", issues: body.error.issues });

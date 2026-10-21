@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkSlot, endOf } from "./rules.js";
+import { checkSlot, endOf, slotsOf } from "./rules.js";
 
 const now = new Date("2026-11-08T12:00:00-03:00");
 const tuesday = (time: string) => new Date(`2026-11-10T${time}:00-03:00`);
@@ -45,4 +45,10 @@ describe("checkSlot", () => {
 
 it("endOf soma a duração da reserva", () => {
   expect(endOf(tuesday("19:00"))).toEqual(tuesday("21:00"));
+});
+
+it("slotsOf lista os inícios possíveis do dia no fuso do restaurante", () => {
+  expect(slotsOf("2026-11-10")).toEqual(
+    ["11:30", "12:00", "12:30", "13:00", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"].map(tuesday),
+  );
 });
