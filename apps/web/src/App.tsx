@@ -3,7 +3,7 @@ import { CalendarDays, Minus, Plus, Sun, Moon, Users } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { createReservation, getAvailability } from "./api";
 import { DatePicker } from "./components/date-picker";
-import { Logo, PaintFilters, Splatter, Wash } from "./components/ink";
+import { Logo, PaintFilters, Splatter, Wash, Wordmark } from "./components/ink";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
@@ -66,25 +66,22 @@ export function App() {
   return (
     <div className="relative overflow-hidden">
       <PaintFilters />
-      <Splatter className="-top-16 -right-20 size-72 rotate-12 text-ochre/40 md:size-96" />
-      <Splatter className="top-[55%] -left-24 size-64 -rotate-12 text-teal/25" />
 
       <header className="relative mx-auto flex max-w-6xl items-center gap-3 px-5 py-5">
         <Logo />
-        <div className="leading-tight">
-          <p className="font-display text-xl font-bold">Pincelada</p>
-          <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase">Cozinha de autor</p>
-        </div>
+        <Wordmark />
       </header>
 
       <main className="relative mx-auto grid max-w-6xl gap-10 px-5 pt-4 pb-20 lg:grid-cols-[1fr_28rem] lg:gap-16 lg:pt-12">
         <section className="relative">
           <Wash className="-top-6 -left-6 h-44 w-[110%] text-ochre/35" />
           <p className="text-primary relative font-semibold tracking-[0.25em] uppercase">Reservas</p>
-          <h1 className="relative mt-3 text-5xl leading-[1.05] font-black md:text-7xl">
-            Sua mesa,
-            <br />
-            <span className="brush-underline">pintada</span> para você.
+          <h1 className="relative mt-4">
+            <span className="font-display text-foreground block text-4xl font-semibold md:text-6xl">Sua mesa,</span>
+            <span className="font-cartoon sticker-text text-primary my-1 block origin-left -rotate-3 text-7xl leading-[1.05] md:text-9xl">
+              pintada
+            </span>
+            <span className="font-display text-foreground block text-4xl font-semibold md:text-6xl">para você.</span>
           </h1>
           <p className="text-muted-foreground relative mt-6 max-w-md text-lg">
             Escolha o dia, o horário e quantas pessoas vêm. A gente reserva a melhor mesa e deixa tudo pronto.
@@ -110,6 +107,7 @@ export function App() {
         </section>
 
         <section aria-label="Reserva" className="relative">
+          <Splatter className="-top-9 -right-7 size-32 rotate-12 text-ochre/70" />
           {reserve.isSuccess ? (
             <Confirmation
               partySize={reserve.data.partySize}

@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/fraunces";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/fredoka";
+@import "@fontsource-variable/nunito";
+@import "@fontsource/chewy";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -32,8 +33,9 @@
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", system-ui, sans-serif;
-  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-sans: "Nunito Variable", system-ui, sans-serif;
+  --font-display: "Fredoka Variable", system-ui, sans-serif;
+  --font-cartoon: "Chewy", "Fredoka Variable", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -96,11 +98,23 @@
   h2,
   h3 {
     @apply font-display tracking-tight;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
+  }
+
+  [data-slot="card-title"],
+  [data-slot="badge"] {
+    font-family: var(--font-display);
   }
 }
 
 @layer components {
+  /* Letra de adesivo: contorno escuro grosso e sombra deslocada, como num desenho animado. */
+  .sticker-text {
+    -webkit-text-stroke: var(--sticker-stroke, 0.08em) var(--foreground);
+    paint-order: stroke fill;
+    text-shadow: 0.06em 0.07em 0 var(--sticker-shadow, var(--ochre));
+    stroke-linejoin: round;
+  }
+
   /* Pincelada com borda irregular: o fundo vai num pseudo-elemento para o texto não ser distorcido. */
   .paint {
     position: relative;
