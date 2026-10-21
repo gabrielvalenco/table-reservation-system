@@ -1,14 +1,17 @@
 import Fastify from "fastify";
 import type pg from "pg";
-import { healthRoutes } from "./health/health.routes.js";
 
-type AppOptions = {
-  pool: pg.Pool;
-  logger?: boolean;
-};
-
-export function buildApp({ pool, logger = false }: AppOptions) {
+export function buildApp(pool: pg.Pool, { logger = false } = {}) {
   const app = Fastify({ logger });
-  app.register(healthRoutes, { prefix: "/api", pool });
+
+  app.get("/api/health", async (_request, reply) => {
+    try {
+      await pool.query("SELECT 1");
+      return { status: "ok" };
+    } catch {
+      return reply.code(503).send({ status: "unavailable" });
+    }
+  });
+
   return app;
 }

@@ -5,9 +5,6 @@
   "workspaces": [
     "apps/*"
   ],
-  "engines": {
-    "node": ">=22"
-  },
   "scripts": {
     "db:up": "docker compose up -d --wait",
     "dev:api": "npm run dev -w apps/api",

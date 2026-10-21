@@ -1,16 +1,14 @@
 import pg from "pg";
+import { z } from "zod";
 import { buildApp } from "./app.js";
-import { loadConfig } from "./config.js";
 
-const config = loadConfig();
-const pool = new pg.Pool({ connectionString: config.DATABASE_URL });
-const app = buildApp({ pool, logger: true });
+const env = z
+  .object({
+    PORT: z.coerce.number().int().positive().default(3000),
+    DATABASE_URL: z.url(),
+  })
+  .parse(process.env);
 
-for (const signal of ["SIGINT", "SIGTERM"]) {
-  process.once(signal, async () => {
-    await app.close();
-    await pool.end();
-  });
-}
+const pool = new pg.Pool({ connectionString: env.DATABASE_URL });
 
-await app.listen({ port: config.PORT, host: config.HOST });
+await buildApp(pool, { logger: true }).listen({ port: env.PORT, host: "0.0.0.0" });
