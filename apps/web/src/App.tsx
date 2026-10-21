@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { CalendarDays, Minus, Plus, Sun, Moon, Users } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { createReservation, getAvailability } from "./api";
+import { DatePicker } from "./components/date-picker";
 import { Logo, PaintFilters, Splatter, Wash } from "./components/ink";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
@@ -13,7 +14,10 @@ import { errorMessage } from "./errors";
 import { addDays, formatDate, formatTime, isLunch, todayInSaoPaulo } from "./format";
 import { cn } from "./lib/utils";
 
-const paint = (color: string) => ({ ["--paint" as string]: color });
+// Espelha rules.closedWeekdays da API (segunda-feira); a API continua sendo quem decide.
+const CLOSED_WEEKDAYS = [1];
+
+const paint =(color: string) => ({ ["--paint" as string]: color });
 
 export function App() {
   const today = todayInSaoPaulo();
@@ -127,15 +131,14 @@ export function App() {
                     <Label htmlFor="date">
                       <CalendarDays className="size-4" /> Data
                     </Label>
-                    <Input
+                    <DatePicker
                       id="date"
-                      type="date"
                       value={date}
                       min={today}
                       max={addDays(today, 30)}
-                      className="bg-background/70 h-11"
-                      onChange={(event) => {
-                        setDate(event.target.value);
+                      disabled={{ dayOfWeek: CLOSED_WEEKDAYS }}
+                      onChange={(value) => {
+                        setDate(value);
                         setSlot(null);
                       }}
                     />
