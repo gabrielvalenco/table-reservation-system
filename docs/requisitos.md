@@ -61,5 +61,4 @@ Multi-restaurante, pagamento, mapa do salão, juntar mesas, lista de espera, SMS
 1. Duração da reserva e turnos reais de funcionamento
 2. Política de cancelamento
 3. Provedor de e-mail e domínio
-4. Hospedagem: VPS com Docker Compose ou serviço gerenciado (PaaS)
-5. O que fazer com grupo maior que a maior mesa
+4. O que fazer com grupo maior que a maior mesa

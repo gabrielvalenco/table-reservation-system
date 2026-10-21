@@ -21,7 +21,7 @@ Sistema de reserva de mesas para restaurante.
 | Testes | Vitest + Postgres real |
 | Infra | Docker Compose |
 
-Por quê: [ADR 001](docs/decisions/001-stack.md).
+Por quê: [ADR 001](docs/decisions/001-stack.md). Hospedagem: [ADR 002](docs/decisions/002-hospedagem.md).
 
 ## Estrutura
 
