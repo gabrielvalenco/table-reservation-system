@@ -1,11 +1,9 @@
 import pg from "pg";
 import { afterAll, expect, it } from "vitest";
+import { testDatabaseUrl } from "../test/database.js";
 import { buildApp } from "./app.js";
 
-const up = new pg.Pool({
-  connectionString:
-    process.env.TEST_DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/reservas_test",
-});
+const up = new pg.Pool({ connectionString: testDatabaseUrl });
 const down = new pg.Pool({ connectionString: "postgres://postgres:postgres@127.0.0.1:1/x" });
 
 afterAll(() => Promise.all([up.end(), down.end()]));
