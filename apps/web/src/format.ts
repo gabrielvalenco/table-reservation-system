@@ -17,3 +17,6 @@ export const addDays = (date: string, days: number) => {
   shifted.setUTCDate(shifted.getUTCDate() + days);
   return shifted.toISOString().slice(0, 10);
 };
+
+const hour = new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", hourCycle: "h23" });
+export const isLunch = (iso: string) => Number(hour.format(new Date(iso))) < 17;
