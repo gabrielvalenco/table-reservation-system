@@ -2,7 +2,7 @@
 
 Sistema de reserva de mesas para restaurante.
 
-> 🚧 Em construção. Ainda não há código: veja os [requisitos](docs/requisitos.md).
+> 🚧 Em construção. Veja os [requisitos](docs/requisitos.md).
 
 ## Como funciona
 
@@ -26,11 +26,24 @@ Por quê: [ADR 001](docs/decisions/001-stack.md).
 ## Estrutura
 
 ```
-apps/api         API (Fastify)
-apps/web         Frontend (React)
-packages/shared  Schemas e tipos compartilhados
-docs/            Requisitos e decisões
+apps/api   API (Fastify)
+apps/web   Frontend (React)
+docs/      Requisitos e decisões
 ```
+
+## Rodando local
+
+Requer Node 22+ e Docker.
+
+```sh
+cp .env.example .env
+npm install
+npm run db:up
+npm run dev:api   # http://localhost:3000/api/health
+npm run dev:web   # http://localhost:5173
+```
+
+Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
 ## Licença
 
