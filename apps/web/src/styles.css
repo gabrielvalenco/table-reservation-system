@@ -1,0 +1,75 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+section,
+form {
+  margin-top: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+input,
+textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+button {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+form button[type="submit"] {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.slots button {
+  width: 100%;
+}
+
+.slots button[aria-pressed="true"] {
+  background: Highlight;
+  color: HighlightText;
+}
+
+[role="alert"] {
+  color: #b00020;
+}
+
+:focus-visible {
+  outline: 3px solid Highlight;
+  outline-offset: 2px;
+}
