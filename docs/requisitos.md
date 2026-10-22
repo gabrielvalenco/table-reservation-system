@@ -47,18 +47,23 @@ Multi-restaurante, pagamento, mapa do salão, juntar mesas, lista de espera, SMS
 
 ## Pronto para produção quando
 
-- [ ] Tudo o que é obrigatório funciona e tem teste
-- [ ] O teste de concorrência passa no CI
-- [ ] Está no ar com HTTPS no domínio final
-- [ ] Um backup foi restaurado com sucesso pelo menos uma vez
+- [x] Tudo o que é obrigatório funciona e tem teste (cliente e equipe; falta só o provedor de e-mail real)
+- [x] O teste de concorrência passa (banco e API; confirmar no CI do PR)
+- [ ] Está no ar com HTTPS no domínio final (a pilha de produção foi testada localmente; falta a VPS e o domínio)
+- [ ] Um backup foi restaurado com sucesso pelo menos uma vez (testado em desenvolvimento; falta na VPS, veja [operação](operacao.md))
 - [ ] O monitor tem alerta configurado
 - [ ] O e-mail sai com SPF/DKIM configurados
-- [ ] O aviso de privacidade está publicado
-- [ ] O README explica setup, deploy, rollback e restore
+- [ ] O aviso de privacidade está publicado (texto pronto; falta o contato do responsável e a revisão jurídica)
+- [x] O README explica setup, deploy, rollback e restore
 
 ## Em aberto
 
-1. Duração da reserva e turnos reais de funcionamento
-2. Política de cancelamento
+1. Duração da reserva e turnos reais de funcionamento (hoje: 2h, almoço 11h30–15h e jantar 18h–23h, fechado às segundas, em `rules.ts`)
+2. Política de cancelamento (hoje: o cliente cancela até 2h antes)
 3. Provedor de e-mail e domínio
-4. O que fazer com grupo maior que a maior mesa
+
+## Decididas na implementação
+
+- **Grupo maior que a maior mesa:** o site avisa que as mesas comportam até N pessoas e pede para falar com o restaurante. A equipe pode reservar mesa por mesa manualmente. Juntar mesas continua fora da v1.
+- **"Contato" da regra 10:** o mesmo e-mail **ou** o mesmo telefone (só os dígitos), por turno (almoço: antes das 17h; jantar: a partir das 17h).
+- **Reservas com mesa desativada** aparecem na agenda marcadas como "mesa desativada", e a tela de mesas lista as afetadas ao desativar.
