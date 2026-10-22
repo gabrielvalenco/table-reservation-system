@@ -18,14 +18,17 @@ beforeEach(async () => {
 
 const valid = {
   name: "Ana Souza",
-  phone: "(11) 99999-9999",
-  email: "ana@example.com",
   partySize: 3,
   startsAt: "2026-11-10T19:00:00-03:00",
 };
 
+// Cada pedido usa um contato novo, para os testes não esbarrarem na regra de 1 reserva por contato e turno.
+let contact = 0;
+
 function post(body: object) {
-  return app.inject({ method: "POST", url: "/api/reservations", payload: body });
+  contact += 1;
+  const unique = { email: `cliente${contact}@example.com`, phone: `(11) 9${String(contact).padStart(4, "0")}-0000` };
+  return app.inject({ method: "POST", url: "/api/reservations", payload: { ...unique, ...body } });
 }
 
 async function tableOf(id: string) {
