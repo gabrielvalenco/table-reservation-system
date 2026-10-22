@@ -9,7 +9,9 @@
   "scripts": {
     "db:up": "docker compose up -d --wait",
     "db:seed": "npm run seed -w apps/api",
+    "staff:create": "npm run staff:create -w apps/api --",
     "demo:concurrency": "npm run demo:concurrency -w apps/api",
+    "bench:availability": "npm run bench:availability -w apps/api",
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",
     "lint": "eslint .",

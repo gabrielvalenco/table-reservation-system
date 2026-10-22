@@ -17,11 +17,15 @@ async function createTable(number: number) {
   return rows[0]!.id;
 }
 
+// Cada reserva ganha um contato próprio: o mesmo contato só pode ter 1 reserva ativa por turno.
+let contact = 0;
+
 function reserve(tableId: number, start: string, end: string, status = "confirmed") {
+  contact += 1;
   return pool.query(
     `INSERT INTO reservations (table_id, starts_at, ends_at, party_size, name, phone, email, status)
-     VALUES ($1, $2, $3, 2, 'Ana', '11999999999', 'ana@example.com', $4)`,
-    [tableId, at(start), at(end), status],
+     VALUES ($1, $2, $3, 2, 'Ana', $5, $6, $4)`,
+    [tableId, at(start), at(end), status, `1199${String(contact).padStart(7, "0")}`, `ana${contact}@example.com`],
   );
 }
 

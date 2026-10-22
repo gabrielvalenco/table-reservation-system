@@ -4,12 +4,18 @@ export const rules = {
   slotMinutes: 30,
   minAdvanceMinutes: 60,
   maxAdvanceDays: 30,
+  cancelMinAdvanceMinutes: 120,
   closedWeekdays: ["Mon"],
   shifts: [
     { start: "11:30", end: "15:00" },
     { start: "18:00", end: "23:00" },
   ],
 };
+
+const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/** Dias de folga como números de 0 (domingo) a 6 (sábado), o formato do JavaScript e do front. */
+export const closedWeekdayNumbers = rules.closedWeekdays.map((day) => weekdays.indexOf(day));
 
 export type SlotError = "invalid_slot" | "closed" | "too_soon" | "too_far";
 
@@ -61,7 +67,7 @@ export function endOf(startsAt: Date) {
   return new Date(startsAt.getTime() + rules.durationMinutes * MINUTE);
 }
 
-export function checkSlot(startsAt: Date, now: Date): SlotError | null {
+export function checkSlot(startsAt: Date, now: Date, { ignoreAdvance = false } = {}): SlotError | null {
   const parts = localParts(startsAt);
   const start = toMinutes(`${parts.hour}:${parts.minute}`);
 
@@ -74,9 +80,24 @@ export function checkSlot(startsAt: Date, now: Date): SlotError | null {
   );
   if (rules.closedWeekdays.includes(parts.weekday!) || !fitsShift) return "closed";
 
+  if (ignoreAdvance) return null;
+
   const advance = startsAt.getTime() - now.getTime();
   if (advance < rules.minAdvanceMinutes * MINUTE) return "too_soon";
   if (advance > rules.maxAdvanceDays * 24 * 60 * MINUTE) return "too_far";
 
   return null;
+}
+
+/** Início e fim (exclusivo) de um dia no horário de São Paulo, para consultar o banco. */
+export function dayRange(date: string) {
+  const start = atLocalTime(date, 0);
+  const [year, month, day] = date.split("-").map(Number);
+  const next = new Date(Date.UTC(year!, month! - 1, day! + 1)).toISOString().slice(0, 10);
+  return { start, end: atLocalTime(next, 0) };
+}
+
+/** O cliente só cancela até 2h antes do início; a equipe cancela quando quiser. */
+export function cancelDeadline(startsAt: Date) {
+  return new Date(startsAt.getTime() - rules.cancelMinAdvanceMinutes * MINUTE);
 }

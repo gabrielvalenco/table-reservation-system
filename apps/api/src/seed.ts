@@ -1,8 +1,11 @@
 import pg from "pg";
 import { z } from "zod";
 import { migrate } from "./migrate.js";
+import { hashPassword } from "./security.js";
 
-const { DATABASE_URL } = z.object({ DATABASE_URL: z.url() }).parse(process.env);
+const { DATABASE_URL, SEED_STAFF_EMAIL, SEED_STAFF_PASSWORD } = z
+  .object({ DATABASE_URL: z.url(), SEED_STAFF_EMAIL: z.email().optional(), SEED_STAFF_PASSWORD: z.string().min(10).optional() })
+  .parse(process.env);
 
 // Salão de desenvolvimento: 11 mesas, com uma única de 8 lugares (útil para demonstrar concorrência).
 const layout = [
@@ -24,6 +27,15 @@ if (Number(rows[0]!.count) > 0) {
     layout.map((table) => table.capacity),
   ]);
   console.log(`Criadas ${layout.length} mesas.`);
+}
+
+if (SEED_STAFF_EMAIL && SEED_STAFF_PASSWORD) {
+  await pool.query(
+    `INSERT INTO staff_users (email, name, password_hash) VALUES ($1, $2, $3)
+     ON CONFLICT (lower(email)) DO NOTHING`,
+    [SEED_STAFF_EMAIL, "Equipe (desenvolvimento)", await hashPassword(SEED_STAFF_PASSWORD)],
+  );
+  console.log(`Usuário da equipe de desenvolvimento: ${SEED_STAFF_EMAIL}`);
 }
 
 await pool.end();
