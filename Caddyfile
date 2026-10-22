@@ -1,4 +1,12 @@
 # HTTPS automático (Let's Encrypt) para o domínio em DOMAIN. Front e API no mesmo domínio: sem CORS.
+# Com DOMAIN=":80" (Dokploy), serve só HTTP e quem faz o HTTPS é o proxy da frente.
+{
+	servers {
+		# Atrás de outro proxy na rede interna, mantém o IP real do cliente no X-Forwarded-For (rate limit por cliente).
+		trusted_proxies static private_ranges
+	}
+}
+
 {$DOMAIN:localhost} {
 	encode gzip zstd
 
