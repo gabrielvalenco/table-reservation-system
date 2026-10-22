@@ -22,7 +22,7 @@ declare module "fastify" {
   }
 }
 
-type Options = { pool: pg.Pool; now: () => Date; mailer: Mailer; publicUrl: string; production: boolean };
+type Options = { pool: pg.Pool; now: () => Date; mailer: Mailer; publicUrl: string };
 
 const SESSION_COOKIE = "session";
 const SESSION_HOURS = 12;
@@ -38,7 +38,7 @@ const reservationSelect = `
 const idParams = z.object({ id: z.uuid() });
 const tableIdParams = z.object({ id: z.coerce.number().int().positive() });
 
-export const staffRoutes: FastifyPluginAsync<Options> = async (app, { pool, now, mailer, publicUrl, production }) => {
+export const staffRoutes: FastifyPluginAsync<Options> = async (app, { pool, now, mailer, publicUrl }) => {
   const mail = (email: Parameters<Mailer["send"]>[0]) => sendInBackground(mailer, app.log, email);
 
   async function requireStaff(request: FastifyRequest, reply: FastifyReply) {
@@ -87,7 +87,8 @@ export const staffRoutes: FastifyPluginAsync<Options> = async (app, { pool, now,
     reply.setCookie(SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: "strict",
-      secure: production,
+      // Só exige HTTPS quando o site é servido em HTTPS (um domínio de teste em HTTP perderia o login).
+      secure: publicUrl.startsWith("https://"),
       path: "/",
       expires: expiresAt,
     });

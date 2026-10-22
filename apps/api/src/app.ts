@@ -15,7 +15,7 @@ export type AppOptions = {
   publicUrl?: string;
   /** Liga o rate limit. Os testes o deixam desligado. */
   rateLimit?: boolean;
-  /** Cookie `Secure` e confiança no proxy reverso (produção). */
+  /** Confiança no proxy reverso (produção). O cookie `Secure` segue o protocolo de `publicUrl`. */
   production?: boolean;
 };
 
@@ -43,7 +43,7 @@ export function buildApp(pool: pg.Pool, options: AppOptions = {}) {
   });
 
   app.register(reservationRoutes, { prefix: "/api", pool, now, mailer, publicUrl });
-  app.register(staffRoutes, { prefix: "/api", pool, now, mailer, publicUrl, production });
+  app.register(staffRoutes, { prefix: "/api", pool, now, mailer, publicUrl });
 
   return app;
 }
