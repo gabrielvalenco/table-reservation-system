@@ -53,7 +53,7 @@ Quando a VPS já roda o Dokploy, o Traefik dele ocupa as portas 80/443 e faz o H
 3. **Domains:** host do domínio, serviço `web`, porta `80`, HTTPS ligado com Let's Encrypt. O DNS do domínio precisa apontar para o IP da VPS.
 4. **Deploy.** Depois, crie o usuário da equipe pelo terminal do container `api`: `node apps/api/dist/create-staff.js email "Nome" "senha-longa"`.
 
-⚠️ Use um domínio com HTTPS. Em HTTP (por exemplo, um domínio `traefik.me` gerado pelo Dokploy) o cookie de sessão da equipe é `Secure` e o navegador não o guarda: o login não funciona.
+Para testar, dá para usar o domínio `traefik.me` que o Dokploy gera (só HTTP): ponha `PUBLIC_URL=http://...traefik.me` e o cookie da equipe deixa de exigir HTTPS. ⚠️ Em produção, use um domínio próprio com HTTPS: em HTTP a senha da equipe e os links dos clientes trafegam sem criptografia.
 
 ## Atualizar e voltar atrás (rollback)
 

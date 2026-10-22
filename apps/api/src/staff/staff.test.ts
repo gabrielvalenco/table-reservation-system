@@ -1,4 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { buildApp } from "../app.js";
 import {
   STAFF,
   createStaff,
@@ -39,6 +40,18 @@ describe("sessão", () => {
     }
   });
 
+  it("em um site HTTP o cookie não é Secure, senão o navegador o descartaria", async () => {
+    const httpApp = buildApp(pool, { publicUrl: "http://reservas.traefik.me" });
+    const login = await httpApp.inject({
+      method: "POST",
+      url: "/api/auth/login",
+      payload: { email: STAFF.email, password: STAFF.password },
+    });
+    await httpApp.close();
+
+    expect(login.cookies.find((item) => item.name === "session")).not.toHaveProperty("secure");
+  });
+
   it("recusa senha errada e e-mail desconhecido com a mesma resposta", async () => {
     const wrong = await app.inject({ method: "POST", url: "/api/auth/login", payload: { email: STAFF.email, password: "errada" } });
     const unknown = await app.inject({ method: "POST", url: "/api/auth/login", payload: { email: "outro@example.com", password: "qualquer" } });
@@ -57,7 +70,7 @@ describe("sessão", () => {
     const cookie = login.cookies.find((item) => item.name === "session")!;
 
     expect(login.statusCode).toBe(200);
-    expect(cookie).toMatchObject({ httpOnly: true, sameSite: "Strict", path: "/" });
+    expect(cookie).toMatchObject({ httpOnly: true, sameSite: "Strict", path: "/", secure: true });
     const { rows } = await pool.query("SELECT token_hash FROM staff_sessions WHERE token_hash = $1", [cookie.value]);
     expect(rows).toHaveLength(0);
     expect((await app.inject({ method: "GET", url: "/api/auth/me", cookies: { session: cookie.value } })).json()).toMatchObject({
