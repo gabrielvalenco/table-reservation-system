@@ -45,6 +45,10 @@ services:
       DOMAIN: ":80"
     expose:
       - "80"
+    # O Dokploy acrescenta a rede dele ao serviço com domínio. Sem a "default" declarada aqui,
+    # o web sai da rede do projeto e deixa de alcançar a api (502 em /api).
+    networks:
+      - default
 
 volumes:
   db:
