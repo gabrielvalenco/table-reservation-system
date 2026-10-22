@@ -2,7 +2,7 @@
 
 Sistema de reserva de mesas para restaurante.
 
-> 🚧 Em construção. Veja os [requisitos](docs/requisitos.md).
+> 🚧 Em construção. Veja os [requisitos](docs/requisitos.md) e o [roadmap](docs/roadmap.md).
 
 ## Como funciona
 
@@ -39,9 +39,12 @@ Requer Node 22+ e Docker.
 cp .env.example .env
 npm install
 npm run db:up
+npm run db:seed       # 11 mesas de desenvolvimento
 npm run dev:api   # http://localhost:3000/api/health
 npm run dev:web   # http://localhost:5173
 ```
+
+Demonstração de concorrência (com a API no ar): `npm run demo:concurrency` dispara 20 pedidos simultâneos para a única mesa de 8 lugares e confirma que só 1 reserva é criada.
 
 Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
