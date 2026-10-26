@@ -1,0 +1,54 @@
+# Deploy no Dokploy: o Traefik dele cuida do domínio e do HTTPS, então o Caddy só serve HTTP na porta 80 da rede interna.
+# No Dokploy: Compose, caminho docker-compose.dokploy.yml; na aba Domains, serviço "web", porta 80, HTTPS ligado.
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: reservas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: reservas
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "reservas"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      target: api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://reservas:${POSTGRES_PASSWORD}@db:5432/reservas
+      PUBLIC_URL: ${PUBLIC_URL:?defina PUBLIC_URL}
+      SMTP_URL: ${SMTP_URL:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      DOMAIN: ":80"
+    expose:
+      - "80"
+    # O Dokploy acrescenta a rede dele ao serviço com domínio. Sem a "default" declarada aqui,
+    # o web sai da rede do projeto e deixa de alcançar a api (502 em /api).
+    networks:
+      - default
+
+volumes:
+  db:

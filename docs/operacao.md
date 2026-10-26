@@ -44,6 +44,17 @@ docker compose -f docker-compose.prod.yml --env-file .env.production exec api \
 
 (Em desenvolvimento, use `npm run staff:create -- email nome senha`.)
 
+## Deploy no Dokploy
+
+Quando a VPS já roda o Dokploy, o Traefik dele ocupa as portas 80/443 e faz o HTTPS. Use `docker-compose.dokploy.yml`, em que o Caddy só serve HTTP na rede interna.
+
+1. **Create Service → Compose**, fonte Git: `https://github.com/gabrielvalenco/table-reservation-system`, branch `main`, caminho `docker-compose.dokploy.yml`.
+2. **Environment:** `POSTGRES_PASSWORD` (longa e aleatória), `PUBLIC_URL` (`https://` + domínio), `SMTP_URL` e `MAIL_FROM` (opcionais até escolher o provedor; sem eles nenhum e-mail sai).
+3. **Domains:** host do domínio, serviço `web`, porta `80`, HTTPS ligado com Let's Encrypt. O DNS do domínio precisa apontar para o IP da VPS.
+4. **Deploy.** Depois, crie o usuário da equipe pelo terminal do container `api`: `node apps/api/dist/create-staff.js email "Nome" "senha-longa"`.
+
+Para testar, dá para usar o domínio `traefik.me` que o Dokploy gera (só HTTP): ponha `PUBLIC_URL=http://...traefik.me` e o cookie da equipe deixa de exigir HTTPS. ⚠️ Em produção, use um domínio próprio com HTTPS: em HTTP a senha da equipe e os links dos clientes trafegam sem criptografia.
+
 ## Atualizar e voltar atrás (rollback)
 
 Atualizar:
